@@ -1,22 +1,22 @@
 from database import *
 from config import *
+from constant import *
 import mysql.connector
 from mysql.connector import errorcode
 
 
-class Products():
+class Products:
 
     def __init__(self, barcode, name, nutriscore, url, market, cat_id):
 
         self.element = [
-        barcode,
-        name,
-        nutriscore,
-        url,
-        market,
-        cat_id,
+            barcode,
+            name,
+            nutriscore,
+            url,
+            market,
+            cat_id,
         ]
-        
 
     def add_p(self):
 

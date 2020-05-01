@@ -5,21 +5,29 @@ import sys
 import mysql.connector
 from mysql.connector import errorcode
 from config import *
+from constant import *
 from database import *
+from product import *
 import request
+
 
 def main():
 
-    cnx = mysql.connector.connect(**DB_CONFIG)
-    cursor = cnx.cursor(buffered=True)
     list_prod = []
+    list_sub = []
+    list_save = []
     main_menu = True
+    display_sub = False
     cat_choice = False
     prod_display = False
-    third_choice = False
-    fourth_choice = False
+    restart = False
+    choice_sub = False
+    select_sub = False
+    save_substitut = False
+    error_id0 = False
+    error_id1 = False
 
-    while main_menu :
+    while main_menu:
 
         print(LINE)
         print(SPACE)
@@ -28,7 +36,6 @@ def main():
         print("3 Remplir Database")
         print(SPACE)
         print("4 Quitter le programme")
-
         print(LINE)
         print(SPACE)
         r = int(input("Sélectionner un numéro: "))
@@ -39,15 +46,12 @@ def main():
             cat_choice = True
 
         elif r == 2:
-            print("***Sauvegarde vide.***")
-            print(LINE)
-            print(SPACE)
+            main_menu = False
+            display_sub = True
 
         elif r == 3:
 
-            cnx
-            cursor
-
+            list_save = False
             database()
             print(LINE)
             print(SPACE)
@@ -60,111 +64,311 @@ def main():
             print(LINE)
             print(SPACE)
 
-            cursor.close()
-            cnx.close()
-
         elif r == 4:
             print("***Au revoir!***")
             print(LINE)
             print(SPACE)
-            # main_menu = False
+            main_menu = False
 
         else:
 
             print(LINE)
             print(SPACE)
-            print("***Pour faire une sélection. Tapez son numéro.***")
+            print("***Attention: Pour faire une sélection. Tapez son numéro.***")
             print(LINE)
 
         while cat_choice:
 
-            print('1', name_category[0])
-            print('2', name_category[1])
-            print('3', name_category[2])
-            print('4', name_category[3])
-            print('5', name_category[4])
+            print("1", name_category[0])
+            print("2", name_category[1])
+            print("3", name_category[2])
+            print("4", name_category[3])
+            print("5", name_category[4])
             print(SPACE)
             print("6 Retour au menu principal")
-            
             print(LINE)
             print(SPACE)
 
-            r = int(input("Sélectionner un numéro: "))
+            r0 = int(input("Sélectionner un numéro: "))
 
-            if r >= 1 and r <= 5:
+            if r0 >= 1 and r0 <= 5:
 
                 print(LINE)
                 print(SPACE)
-                print("Sélection de la catégorie: {}".format(name_category[r-1]))
+                print("Sélection de la catégorie: {}".format(name_category[r0 - 1]))
                 print(LINE)
                 print(SPACE)
                 cat_choice = False
                 prod_display = True
 
-            elif r == 6:
+            elif r0 == 6:
 
                 main_menu = True
                 cat_choice = False
                 prod_display = False
-                third_choice = False
-                fourth_choice = False
+                restart = False
+                save_substitut = False
 
             else:
 
                 print(LINE)
                 print(SPACE)
-                print("***Pour sélectionnez une catégorie. Tapez son numéro.***")
+                print("***Attention: Pour sélectionnez une catégorie. Tapez son numéro.***")
                 print(LINE)
                 print(SPACE)
+
+        while display_sub:
+
+            cursor.execute("USE {}".format(DB_CONFIG["database"]))
+            cursor.execute(display_save)
+
+            count = cursor.rowcount
+
+            if count == 0:
+
+                print("sauvegarde vide")
+
+            else:
+
+                print(
+                    "{:^10} | {:^10} | {:^10} | {:^100} | {:^50}".format(
+                        "Produits", "Favoris","nutriscore", "nom du favoris", "magasin"
+                    )
+                )
+
+                print(4*LINE)
+                print(SPACE)
+
+                for (prod_id, fav_id, name, nutri, market) in cursor:
+
+                    print(
+                        "{:^10} | {:^10} | {:^10} | {:^100} | {:^50}".format(
+                            prod_id, fav_id, nutri.upper(), name, market
+                        )
+                    )
+
+                print(SPACE)
+                print(4*LINE)
+
+
+            main_menu = True
+            cat_choice = False
+            prod_display = False
+            restart = False
+            display_sub = False
 
         while prod_display:
 
-            cnx
-            cursor
+            print(LINE)
+            print(LINE)
 
-            cursor.execute("USE {}".format(DB_CONFIG['database']))
-            cursor.execute(display_product.format(r))
+            cursor.execute("USE {}".format(DB_CONFIG["database"]))
+            cursor.execute(display_product.format(r0))
 
-            print("{:^4} | {:^13} | {:^10} | {}".format("id", "barcode", "nutriscore", "name"))
+            print(
+                "{:^4} | {:^13} | {:^10} | {}".format(
+                    "id", "barcode", "nutriscore", "name"
+                )
+            )
 
             for (p_id, barcode, name, nutri) in cursor:
+
+                print(
+                    "{:^4} | {:^13} | {:^10} | {}".format(
+                        p_id, barcode, nutri.upper(), name
+                    )
+                )
+
                 list_prod.append(p_id)
-                print("{:^4} | {:^13} | {:^10} | {}".format(p_id, barcode, nutri.upper(), name))
 
-            r = int(input("Sélectionner un id: "))
+            if error_id0 is True:
 
-            if r in list_prod:
+                print(SPACE)
+                print("***Attention: Pour sélectionnez un produit. Tapez son id.***")
+                print(SPACE)
 
-                cnx
-                cursor
+            r1 = int(input("Sélectionner un id: "))
+
+            if r1 in list_prod:
+
+                print(LINE)
+                print(SPACE)
+                print("*** Produit sélectionner ***")
+                print(LINE)
+                print(SPACE)
+
+                cursor.execute(select_product.format(r1))
+
+                print(
+                    "{:^4} | {:^13} | {:^10} | {}".format(
+                        "id", "barcode", "nutriscore", "name"
+                    )
+                )
                 
-                cursor.execute("USE {}".format(DB_CONFIG['database']))
-                cursor.execute(select_product.format(r))
-                print(select_product.format(r))
-                print("{:^4} | {:^13} | {:^10} | {}".format("id", "barcode", "nutriscore", "name"))
-                print("{:^4} | {:^13} | {:^10} | {}".format(p_id, barcode, nutri.upper(), name))
+                for (p_id, barcode, name, nutri) in cursor:
+
+                    print(
+                        "{:^4} | {:^13} | {:^10} | {}".format(
+                            p_id, barcode, nutri.upper(), name
+                        )
+                    )
+
+                prod_display = False
+                choice_sub = True
+
+            else:
+             
+                error_id0 = True
+                prod_display = True
+
+        while choice_sub:
+
+            print(LINE)
+            print(SPACE)
+            print("*** Substitut proposer ***")
+            print(LINE)
+            print(SPACE)
+
+            cursor.execute(choice_substitut.format(nutri, r0))
+
+            print(
+                "{:^4} | {:^13} | {:^10} | {}".format(
+                    "id", "barcode", "nutriscore", "name"
+                )
+            )
+                
+            for (p_id, barcode, name, nutri) in cursor:
+
+                print(
+                    "{:^4} | {:^13} | {:^10} | {}".format(
+                        p_id, barcode, nutri.upper(), name
+                    )
+                )
+                list_sub.append(p_id)
+
+            if error_id1 is True:
+
+                print(SPACE)
+                print("***Attention: Pour sélectionnez un produit. Tapez son id.***")
+                print(SPACE)
+
+            r2 = int(input("Sélectionner un substitut: "))
+
+            if r2 in list_sub:
+
+                print(LINE)
+                print(SPACE)
+                print("*** Substitut sélectionner ***")
+                print(LINE)
+                print(SPACE)
+
+                cursor.execute(select_product.format(r2))
+
+                print(
+                    "{:^4} | {:^13} | {:^10} | {}".format(
+                        "id", "barcode", "nutriscore", "name"
+                    )
+                )
+                
+                for (p_id, barcode, name, nutri) in cursor:
+
+                    print(
+                        "{:^4} | {:^13} | {:^10} | {}".format(
+                            p_id, barcode, nutri.upper(), name
+                        )
+                    )
+
+                cat_choice = False
+                prod_display = False
+                choice_sub = False
+                save_substitut = True
+                restart = False
 
             else:
 
-                print("not")	
+                error_id1 = True
+                choice_sub = True
 
-            cursor.close()
-            cnx.close()
+            if r == 2:
 
-            prod_display = False
-            third_choice = True
+                main_menu = False
+                cat_choice = False
+                prod_display = False
+                choice_sub = False
+                save_substitut = False
+                restart = True
 
-        while third_choice:
+        while save_substitut:
 
-            r = int(input("6 Retour au menu principal: "))
+            list_sub = [r1, r2]
 
-            if r == 6:
+            print(LINE)
+            print(SPACE)
+            print("1", "oui")
+            print("2", "non")
+            print(LINE)
+            print(SPACE)
+            r = int(input("Voulez-vous sauvegarder ?: "))
+            print(LINE)
+            print(SPACE)
+
+            if r == 1:
+
+                try:
+
+                    cursor.execute("USE {}".format(DB_CONFIG["database"]))
+                    cursor.execute(add_favorite, list_sub)
+
+                    list_save = True
+
+                    print("sauvegarde effectuer")
+
+                except:
+
+                    print("substitut déjà enregistrer pour ce produit")
+
+                save_substitut = False
+                restart = True 
+
+            if r == 2:
+
+                main_menu = False
+                cat_choice = False
+                prod_display = False
+                save_substitut = False
+                restart = True
+
+
+        while restart:
+
+            print(LINE)
+            print(SPACE)
+            print("1", "Retour au menu principal")
+            print("2", "Quitter le programme")
+            print(LINE)
+            print(SPACE)
+
+            r = int(input("Retour au menu principal: "))
+
+            if r == 1:
 
                 main_menu = True
                 cat_choice = False
                 prod_display = False
-                third_choice = False
+                restart = False
 
+            if r == 2:
+
+                main_menu = False
+                cat_choice = False
+                prod_display = False
+                restart = False
 
 if __name__ == "__main__":
+
+    cnx = mysql.connector.connect(**DB_CONFIG)
+    cursor = cnx.cursor(buffered=True)
+    cursor
     main()
+    cursor.close()
+    cnx.close()
