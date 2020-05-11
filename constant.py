@@ -1,3 +1,4 @@
+# -tc- en python, on peut répéter un caractère avec "_" * 80
 LINE = "___________________________________________________"
 SPACE = "                                                  "
 
