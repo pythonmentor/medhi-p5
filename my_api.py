@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+# -tc- les deux lignes ci-dessus sont inutile
+# -tc- le nom du module ne décrit pas ce qu'on y trouve
+
+# -tc- attention à respecter la pep8 dans le formatage des imports et n'utiliser par l'étoile
 import sys
 import mysql.connector
 from mysql.connector import errorcode
@@ -10,7 +14,17 @@ from database import *
 from product import *
 import request
 
+# -tc- le code est très répétitif. Factoriser dans une classe. Utiliser
+# -tc- une méthode pour chaque menu et une méthode pour gérer la saisie.
+# -tc- Attention: vos saisies ne repectent pas le cahier des charges et ne pourront
+# -tc- être validées.
 
+
+# -tc- si on doit scroller pour lire votre fonction -> factoriser
+# -tc- max 20 lignes.
+
+# -tc- vos saisies ne sont pas sures. Si l'utilisateur entre une lettre,
+# -tc- vous avez une erreur
 def main():
 
     list_prod = []
@@ -27,6 +41,9 @@ def main():
     error_id0 = False
     error_id1 = False
 
+    # -tc- une logique à base de while imbriqués n'est pas la bonne manière d'implémenter
+    # -tc- un système de menu. Mettez tout cela dans une classe et utiliser
+    # -tc- une méthode par menu.
     while main_menu:
 
         print(LINE)
@@ -71,6 +88,7 @@ def main():
             main_menu = False
 
         else:
+  
 
             print(LINE)
             print(SPACE)
@@ -110,7 +128,7 @@ def main():
                 save_substitut = False
 
             else:
-
+                # -tc- si la saisie n'eat pas correcte, on doit ré-afficher le menu
                 print(LINE)
                 print(SPACE)
                 print("***Attention: Pour sélectionnez une catégorie. Tapez son numéro.***")
@@ -118,7 +136,9 @@ def main():
                 print(SPACE)
 
         while display_sub:
-
+  
+            # -tc- pas de requêtes sql dans l'ui. Grouper les requêtes dans une classe et créer une méthode
+            # -tc- par requête
             cursor.execute("USE {}".format(DB_CONFIG["database"]))
             cursor.execute(display_save)
 
@@ -129,6 +149,7 @@ def main():
                 print("sauvegarde vide")
 
             else:
+
 
                 print(
                     "{:^10} | {:^10} | {:^10} | {:^100} | {:^50}".format(
@@ -141,6 +162,7 @@ def main():
 
                 for (prod_id, fav_id, name, nutri, market) in cursor:
 
+                    # -tc- créer une classe Product pour réprésenter un produit et sa méthode __str__ pour dérer son affichage
                     print(
                         "{:^10} | {:^10} | {:^10} | {:^100} | {:^50}".format(
                             prod_id, fav_id, nutri.upper(), name, market
@@ -365,7 +387,7 @@ def main():
                 restart = False
 
 if __name__ == "__main__":
-
+    # -tc- pas de code hors du main
     cnx = mysql.connector.connect(**DB_CONFIG)
     cursor = cnx.cursor(buffered=True)
     cursor
