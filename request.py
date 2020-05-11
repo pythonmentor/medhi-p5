@@ -4,12 +4,16 @@
 import mysql.connector
 from mysql.connector import errorcode
 import requests
+# -tc- éliminer les étoiles
 from config import *
 from database import *
 from product import *
 from constant import *
 
-
+# -tc- utiliser des classes différentes pour downloader les produits, valider et nettoyer les produits, et enregistrer les produits/catégories/magasins.
+# -tc- ne faites pas les requêtes à l'API dans une classe qui manipule la base et, surtout
+# -tc- gérer les erreurs possibles lorsque vous faites une requête à l'api
+# -tc- retravailler également votre modèle de données qui ne correspond pas au besoin.
 class Request:
     
     def __init__(self):
