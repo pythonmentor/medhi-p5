@@ -3,10 +3,14 @@
 
 import mysql.connector
 from mysql.connector import errorcode
+# -tc- ne pas utiliser l'étoile dans un import. La pep8 dit de l'éviter
 from config import *
 from constant import *
 
 
+# -tc- plutôt qu'une fonction qui voys connecte et vous
+# -tc- déconnecte de base immédiatement, définir une classe
+# -tc- Database représentant la connection.
 def database():
 
     cnx = mysql.connector.connect(**DB_CONFIG)
@@ -19,6 +23,7 @@ def database():
         print("Failed delete database: {}".format(err))
         exit(1)
 
+    # -tc- Quel intérêt ici de créer une fonction dans la fonction?
     def create_database(cursor):
         try:
             cursor.execute(
