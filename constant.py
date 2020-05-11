@@ -29,7 +29,7 @@ add_product = (
     " VALUES (%s, %s, %s, %s, %s, %s)"
 )
 
-display_product = "SELECT p_id, barcode, name, score FROM Products WHERE cat_id = {}"
+display_product = "SELECT p_id, barcode, name, score FROM Products WHERE cat_id = {}" # -tc- ne pas utiliser format ici
 
 select_product = "SELECT p_id, barcode, name, score FROM Products WHERE p_id = {}"
 
@@ -43,6 +43,10 @@ display_save = "SELECT fav_id, prod_id, name, score, market FROM Products FULL J
 
 TABLES = {}
 
+# -tc- InnoDB est la valeur par défaut. Pas besoin de le spécifier
+# -tc- il manque min 3 tables à votre modèle pour spécifier qu'un produit
+# -tc- a plusieurs catégories et plusieurs magasins
+
 TABLES["Categories"] = (
     "CREATE TABLE `Categories` ("
     "   `c_id` SMALLINT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
@@ -50,6 +54,8 @@ TABLES["Categories"] = (
     ") ENGINE=InnoDB"
 )
 
+# -tc- stocker les magasins dans une table séparée. Avec votre modèle, un produit
+# -tc- ne peut avoir qu'une catégorie
 TABLES["Products"] = (
     "CREATE TABLE `Products` ("
     "   `p_id` SMALLINT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
